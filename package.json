@@ -1,0 +1,23 @@
+{
+  "name": "model-logging",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "yarn run build:ts && yarn run build:copy",
+    "build:ts": "tsc --project tsconfig.json --declaration --outDir ./dist",
+    "build:copy": "copy package.json dist && copy README.md dist"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-cloudwatch": "^3.449.0",
+    "@nestjs/common": "^10.2.8",
+    "axios": "^1.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.9.0",
+    "typescript": "^5.2.2"
+  }
+}
