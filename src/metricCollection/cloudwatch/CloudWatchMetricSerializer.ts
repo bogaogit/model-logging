@@ -39,7 +39,7 @@ export class CloudWatchMetricSerializer implements MetricSerializer {
                 {
                     MetricName: metric,
                     Dimensions: this.mapTagsToDimensions(tags),
-                    Timestamp: millisSinceEpoch,
+                    Timestamp: new Date(millisSinceEpoch),
                     Value: value,
                     Unit: units
                 }

@@ -3,5 +3,5 @@ import {GetMetricDataCommandInput, MetricDataResult, PutMetricDataCommandInput} 
 export interface MetricStore {
     ingest(metrics: (string | PutMetricDataCommandInput)[]): Promise<void>
 
-    getMetricData(getMetricDataCommandInput: GetMetricDataCommandInput): Promise<MetricDataResult[] | number[] | undefined>
+    getMetricData(getMetricDataCommandInput: string | GetMetricDataCommandInput): Promise<MetricDataResult[] | number[] | undefined>
 }

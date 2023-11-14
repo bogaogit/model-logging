@@ -1,4 +1,4 @@
-import { Dimension } from '@aws-sdk/client-cloudwatch/dist-types/models'
+import {Dimension} from "@aws-sdk/client-cloudwatch";
 
 export function mapTagsToDimensions(tags: Record<string, string> | undefined): Dimension[] {
     if (!tags) return []

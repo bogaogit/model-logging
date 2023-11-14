@@ -31,9 +31,20 @@ export class CloudWatchMetricStore implements MetricStore {
         const metricGroups = this.groupBy(putMetricDataCommandInputs, 'Namespace')
 
         try {
-            const response = await this.cloudWatch.putMetricData(putMetricDataCommandInput);
+            Object.keys(metricGroups).forEach(key => {
+                const groupPutMetricDataCommandInput: PutMetricDataCommandInput = {
+                    Namespace: metricGroups[key][0].Namespace,
+                    MetricData: []
+                }
 
-            console.log(response);
+                groupPutMetricDataCommandInput.MetricData = [].concat.apply([], metricGroups[key].map(
+                    putMetricDataCommandInput => putMetricDataCommandInput.MetricData
+                ))
+
+                this.cloudWatch.putMetricData(groupPutMetricDataCommandInput);
+                console.log(groupPutMetricDataCommandInput);
+            })
+
             console.log("Metrics data sent successfully.");
         } catch (error) {
             console.error("Failed to send metrics data.", error);

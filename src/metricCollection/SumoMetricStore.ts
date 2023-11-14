@@ -25,4 +25,8 @@ export class SumoMetricStore implements MetricStore {
   queryLatestMetric(query: string): Promise<number | undefined> {
     return Promise.resolve(undefined);
   }
+
+  getMetricData(query: string): Promise<number[]> {
+    return Promise.resolve(undefined);
+  }
 }
