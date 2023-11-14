@@ -1,4 +1,4 @@
-import { CloudWatchMetric } from './cloudwatch/CloudWatchMetricStore'
+import {PutMetricDataCommandInput} from "@aws-sdk/client-cloudwatch";
 
 export interface MetricSerializer {
   build(
@@ -8,5 +8,5 @@ export interface MetricSerializer {
     tags: Record<string, string>,
     millisSinceEpoch: number,
     namespace: string | undefined,
-  ): string | CloudWatchMetric
+  ): string | PutMetricDataCommandInput
 }

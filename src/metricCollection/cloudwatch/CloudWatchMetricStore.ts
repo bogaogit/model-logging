@@ -1,14 +1,18 @@
-import {CloudWatch, GetMetricDataCommandInput, PutMetricDataCommandInput} from "@aws-sdk/client-cloudwatch";
+import {
+    CloudWatch,
+    GetMetricDataCommandInput,
+    MetricDataResult,
+    PutMetricDataCommandInput
+} from "@aws-sdk/client-cloudwatch";
 
 import {MetricStore} from '../MetricStore'
 import {Dimension, StandardUnit} from "@aws-sdk/client-cloudwatch/dist-types/models";
-import {mapTagsToDimensions} from "../utils/mapTagsToDimensions";
 
 export interface CloudWatchMetric {
     namespace: string | undefined
     metricName: string | undefined
     dimensions: Dimension[] | undefined
-    unit: CloudWatchMetricUnit | undefined
+    unit: StandardUnit | undefined
     value: number | undefined
 }
 
@@ -23,8 +27,6 @@ export interface QueryCloudWatchMetric {
     stat: string | undefined
 }
 
-export type CloudWatchMetricUnit = StandardUnit
-
 export class CloudWatchMetricStore implements MetricStore {
     private cloudWatch: CloudWatch
 
@@ -36,67 +38,34 @@ export class CloudWatchMetricStore implements MetricStore {
     async ingest(putMetricDataCommandInput: PutMetricDataCommandInput): Promise<void> {
         if (!putMetricDataCommandInput) return
 
-        // const metricData: PutMetricDataCommandInput = {
-        //     Namespace: metric.namespace,
-        //     MetricData: [
-        //         {
-        //             MetricName: metric.metricName,
-        //             Dimensions: metric.dimensions,
-        //             Unit: metric.unit,
-        //             Value: metric.value,
-        //         },
-        //     ],
-        // }
-
-        console.log(metricData);
+        console.log(putMetricDataCommandInput);
         console.log("capture----------------------");
 
         try {
-            const response = await this.cloudWatch.putMetricData(metricData);
+            const response = await this.cloudWatch.putMetricData(putMetricDataCommandInput);
 
             console.log(response);
             console.log("Metrics data sent successfully.");
         } catch (error) {
             console.error("Failed to send metrics data.", error);
         }
-
-
     }
 
     // https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Statistics-definitions.html
 
-    async getMetricData(metricQueries: QueryCloudWatchMetric[]): Promise<number[] | undefined> {
-        if (!metricQueries) return undefined
+    async getMetricData(getMetricDataCommandInput: GetMetricDataCommandInput): Promise<MetricDataResult[] | undefined> {
+        if (!getMetricDataCommandInput) return undefined
 
-        console.log(metricQueries);
-        console.log("queries----------------------");
-
-        const getMetricDataCommandInput: GetMetricDataCommandInput = {
-            StartTime: query.startTime,
-            EndTime: query.endTime,
-            MetricDataQueries: [
-                {
-                    Id: query.id,
-                    MetricStat: {
-                        Metric: {
-                            Namespace: query.namespace,
-                            MetricName: query.metricName,
-                            Dimensions: mapTagsToDimensions(query.tags),
-                        },
-                        Period: query.period,
-                        Stat: query.stat,
-                    },
-                },
-            ],
-        }
+        console.log(getMetricDataCommandInput);
+        console.log("getMetricDataCommandInput----------------------");
 
         this.cloudWatch.getMetricData(getMetricDataCommandInput, (err, data) => {
             if (!err) {
                 if (data?.MetricDataResults) {
-                    console.log(data.MetricDataResults[0]);
+                    console.log(data.MetricDataResults);
                     console.log("Metrics data queried successfully.");
 
-                    return data.MetricDataResults[0].Values
+                    return data.MetricDataResults
                 }
             } else {
                 console.log("error-----------------")
