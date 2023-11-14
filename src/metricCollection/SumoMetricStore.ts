@@ -21,4 +21,8 @@ export class SumoMetricStore implements MetricStore {
       },
     })
   }
+
+  queryLatestMetric(query: string): Promise<number | undefined> {
+    return Promise.resolve(undefined);
+  }
 }

@@ -1,7 +1,7 @@
 // import { Logger } from '../Logger'
 import { MetricSerializer } from './MetricSerializer'
 import { MetricStore } from './MetricStore'
-import {CloudWatchMetric, CloudWatchMetricUnit} from './cloudwatch/CloudWatchMetricStore'
+import {CloudWatchMetric, CloudWatchMetricUnit, QueryCloudWatchMetric} from './cloudwatch/CloudWatchMetricStore'
 
 interface MetricCollectorConfig {
   syncThrottleMs: number
@@ -56,6 +56,10 @@ export class MetricCollector {
         void this.flush()
       }, this.config.syncThrottleMs)
     }
+  }
+
+  queryLatestMetric(query: QueryCloudWatchMetric): Promise<number | undefined> {
+    return this.metricStore.queryLatestMetric(query)
   }
 
   async flush(): Promise<void> {

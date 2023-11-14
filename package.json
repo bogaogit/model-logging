@@ -14,7 +14,8 @@
   "dependencies": {
     "@aws-sdk/client-cloudwatch": "^3.449.0",
     "@nestjs/common": "^10.2.8",
-    "axios": "^1.6.1"
+    "axios": "^1.6.1",
+    "model-logging": "file:dist"
   },
   "devDependencies": {
     "@types/node": "^20.9.0",

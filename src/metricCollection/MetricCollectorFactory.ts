@@ -21,11 +21,6 @@ export class MetricCollectorFactory {
     const resolvedSumoEndpoint = sumoEndpoint ?? process.env.FTR_LOGGING_ENDPOINT
     if (resolvedSumoEndpoint) {
       metricStore = new SumoMetricStore(resolvedSumoEndpoint, 'prometheus')
-    } else {
-      // logger.warn('No FTR_LOGGING_ENDPOINT configured, metrics will be discarded')
-      metricStore = {
-        ingest: () => Promise.resolve(),
-      }
     }
 
     return new MetricCollector(metricSerializer, metricStore)
@@ -46,10 +41,6 @@ export class MetricCollectorFactory {
       metricStore = new CloudWatchMetricStore(region)
     } else {
       // logger.warn('No AWS_REGION configured, metrics will be discarded')
-
-      metricStore = {
-        ingest: () => Promise.resolve(),
-      }
     }
 
     return new MetricCollector(metricSerializer, metricStore)

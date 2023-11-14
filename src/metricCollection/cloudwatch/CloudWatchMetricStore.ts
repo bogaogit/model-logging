@@ -1,5 +1,6 @@
 import {
-  CloudWatchClient,
+  CloudWatch,
+  CloudWatchClient, GetMetricDataCommandInput,
   ListMetricsCommand,
   PutMetricDataCommand,
   PutMetricDataCommandInput
@@ -7,6 +8,8 @@ import {
 
 import { MetricStore } from '../MetricStore'
 import {Dimension, StandardUnit} from "@aws-sdk/client-cloudwatch/dist-types/models";
+import {mapTagsToDimensions} from "../utils/mapTagsToDimensions";
+import {randomUUID} from "crypto";
 
 export interface CloudWatchMetric {
   namespace: string | undefined
@@ -16,14 +19,27 @@ export interface CloudWatchMetric {
   value: number | undefined
 }
 
+export interface QueryCloudWatchMetric {
+  startTime: number | undefined
+  endTime: number | undefined
+  namespace: string | undefined
+  metricName: string | undefined
+  tags: Record<string, string>
+  period: number | undefined
+  stat: string | undefined
+}
+
 export type CloudWatchMetricUnit = StandardUnit
 
 export class CloudWatchMetricStore implements MetricStore {
   private client: CloudWatchClient
+  private cloudWatch: CloudWatch
 
   constructor(region: string) {
     //@ts-ignore
     this.client = new CloudWatchClient({ region })
+    //@ts-ignore
+    this.cloudWatch = new CloudWatch({ region })
   }
 
   async ingest(metrics: CloudWatchMetric[]): Promise<void> {
@@ -60,7 +76,7 @@ export class CloudWatchMetricStore implements MetricStore {
       const command = new PutMetricDataCommand(metricData);
 
       console.log(metricData);
-      console.log("----------------------");
+      console.log("capture----------------------");
 
       try {
         const response = await this.client.send(command);
@@ -73,5 +89,48 @@ export class CloudWatchMetricStore implements MetricStore {
       }
 
     }
+  }
+
+  async queryLatestMetric(query: QueryCloudWatchMetric): Promise<number | undefined> {
+    if (!query) return undefined
+
+    console.log(query);
+    console.log("query----------------------");
+
+    const getMetricDataCommandInput: GetMetricDataCommandInput = {
+      StartTime: new Date(Date.now() - 600000),
+      EndTime: new Date(),
+      MetricDataQueries: [
+        {
+          Id: "a",
+          MetricStat: {
+            Metric: {
+              Namespace: query.namespace,
+              MetricName: query.metricName,
+              Dimensions: mapTagsToDimensions(query.tags),
+            },
+            Period: 600000,
+            Stat: query.stat,
+          },
+        },
+      ],
+    }
+
+    this.cloudWatch.getMetricData(getMetricDataCommandInput, (err, data) => {
+      if (!err) {
+        if (data?.MetricDataResults) {
+          console.log(data.MetricDataResults);
+          console.log("Metrics data queried successfully.");
+
+          return data.MetricDataResults[0].Values?.slice(-1)[0]
+        }
+      } else {
+        console.log("error-----------------")
+        console.log(err)
+      }
+      return undefined
+    })
+
+    return undefined
   }
 }

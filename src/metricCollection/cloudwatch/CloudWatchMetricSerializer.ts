@@ -1,6 +1,7 @@
-import { Dimension, StandardUnit } from '@aws-sdk/client-cloudwatch/dist-types/models/models_0'
+
 import { MetricSerializer } from '../MetricSerializer'
 import { CloudWatchMetric } from './CloudWatchMetricStore'
+import {Dimension, StandardUnit} from "@aws-sdk/client-cloudwatch/dist-types/models";
 
 export class CloudWatchMetricSerializer implements MetricSerializer {
   private mapTagsToDimensions(tags: Record<string, string> | undefined): Dimension[] {
