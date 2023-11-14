@@ -58,8 +58,8 @@ export class MetricCollector {
     }
   }
 
-  queryLatestMetric(query: QueryCloudWatchMetric): Promise<number | undefined> {
-    return this.metricStore.queryLatestMetric(query)
+  getMetricData(query: QueryCloudWatchMetric): Promise<number[] | undefined> {
+    return this.metricStore.getMetricData(query)
   }
 
   async flush(): Promise<void> {

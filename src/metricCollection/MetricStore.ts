@@ -2,5 +2,5 @@ import {CloudWatchMetric, QueryCloudWatchMetric} from './cloudwatch/CloudWatchMe
 
 export interface MetricStore {
   ingest(metrics: (string | CloudWatchMetric)[]): Promise<void>
-  queryLatestMetric(query: string | QueryCloudWatchMetric): Promise<number | undefined>
+  getMetricData(metricQueries: QueryCloudWatchMetric[]): Promise<number[] | undefined>
 }
