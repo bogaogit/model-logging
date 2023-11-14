@@ -1,22 +1,9 @@
 import {MetricSerializer} from '../MetricSerializer'
-import {Dimension, StandardUnit} from "@aws-sdk/client-cloudwatch/dist-types/models";
+import {StandardUnit} from "@aws-sdk/client-cloudwatch/dist-types/models";
 import {PutMetricDataCommandInput} from "@aws-sdk/client-cloudwatch";
+import {mapTagsToDimensions} from "../utils/mapTagsToDimensions";
 
 export class CloudWatchMetricSerializer implements MetricSerializer {
-    private mapTagsToDimensions(tags: Record<string, string> | undefined): Dimension[] {
-        if (!tags) return []
-        const dimensions: Dimension[] = []
-
-        Object.entries(tags).forEach(([key, value]) => {
-            dimensions.push({
-                Name: key,
-                Value: value,
-            })
-        })
-
-        return dimensions
-    }
-
     build(
         metric: string,
         value: number,
@@ -38,7 +25,7 @@ export class CloudWatchMetricSerializer implements MetricSerializer {
             MetricData: [
                 {
                     MetricName: metric,
-                    Dimensions: this.mapTagsToDimensions(tags),
+                    Dimensions: mapTagsToDimensions(tags),
                     Timestamp: new Date(millisSinceEpoch),
                     Value: value,
                     Unit: units

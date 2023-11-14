@@ -59,7 +59,7 @@ export class MetricCollector {
         }
     }
 
-    getMetricData(getMetricDataCommandInput: GetMetricDataCommandInput): Promise<MetricDataResult[] | number[] | undefined> {
+    getMetricData(getMetricDataCommandInput: GetMetricDataCommandInput): Promise<(MetricDataResult | number)[] | undefined> {
         return this.metricStore.getMetricData(getMetricDataCommandInput)
     }
 
