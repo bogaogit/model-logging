@@ -6,26 +6,6 @@ import {
 } from "@aws-sdk/client-cloudwatch";
 
 import {MetricStore} from '../MetricStore'
-import {Dimension, StandardUnit} from "@aws-sdk/client-cloudwatch/dist-types/models";
-
-export interface CloudWatchMetric {
-    namespace: string | undefined
-    metricName: string | undefined
-    dimensions: Dimension[] | undefined
-    unit: StandardUnit | undefined
-    value: number | undefined
-}
-
-export interface QueryCloudWatchMetric {
-    id: string
-    startTime: Date | undefined
-    endTime: Date | undefined
-    namespace: string | undefined
-    metricName: string | undefined
-    tags: Record<string, string>
-    period: number | undefined
-    stat: string | undefined
-}
 
 export class CloudWatchMetricStore implements MetricStore {
     private cloudWatch: CloudWatch
@@ -35,11 +15,20 @@ export class CloudWatchMetricStore implements MetricStore {
         this.cloudWatch = new CloudWatch({region})
     }
 
-    async ingest(putMetricDataCommandInput: PutMetricDataCommandInput): Promise<void> {
-        if (!putMetricDataCommandInput) return
+    groupBy(putMetricDataCommandInputs: PutMetricDataCommandInput[], groupByKey: string): {[key: string]: PutMetricDataCommandInput[]} {
+        return putMetricDataCommandInputs.reduce(function(rv, x) {
+            (rv[x[groupByKey]] = rv[x[groupByKey]] || []).push(x);
+            return rv;
+        }, {});
+    };
 
-        console.log(putMetricDataCommandInput);
+    async ingest(putMetricDataCommandInputs: PutMetricDataCommandInput[]): Promise<void> {
+        if (!putMetricDataCommandInputs) return
+
+        console.log(putMetricDataCommandInputs);
         console.log("capture----------------------");
+
+        const metricGroups = this.groupBy(putMetricDataCommandInputs, 'Namespace')
 
         try {
             const response = await this.cloudWatch.putMetricData(putMetricDataCommandInput);
